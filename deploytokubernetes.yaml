@@ -8,7 +8,6 @@
     k8s:
       state: present
       force: true
-      kubeconfig: "/var/lib/jenkins/.kube/config"
       definition:
         apiVersion: apps/v1
         kind: Deployment
@@ -26,6 +25,7 @@
               metadata:
                 labels:
                   app: xyztechnologies
+                serviceAccountName: jenkins
               spec:
                 containers:
                 - name: xyztechnologies
@@ -35,7 +35,6 @@
   - name: Create Kubernetes Service
     k8s:
       state: present
-      kubeconfig: "/var/lib/jenkins/.kube/config"
       definition:
         apiVersion: v1
         kind: Service
@@ -50,3 +49,4 @@
             port: 8080
             targetPort: 8080
           type: NodePort
+          serviceAccountName: jenkins
