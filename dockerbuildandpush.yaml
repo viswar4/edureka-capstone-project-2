@@ -1,0 +1,23 @@
+---
+- name: To create docker image and push to dockerhub
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Include credentials from vault
+      include_vars:
+        file: docker_credentials.yml
+        name: docker_credentials
+    - name: Login to Dockerhub
+      docker_login:
+        username: "{{ docker_credentials.docker_username }}"
+        password: "{{ docker_credentials.docker_password }}"
+    - name: Build and Push Docker Image
+      docker_image:
+        name: viswar4/edureka-capstone-project1:{{ DOCKER_IMAGE_TAG }}
+        build:
+          path: "{{ WORKSPACE }}"
+        source: build
+        push: true
+    - name: Logout out of Dockerhub
+      docker_login:
+        state: absent
