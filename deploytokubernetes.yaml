@@ -1,0 +1,52 @@
+---
+- name: Deploy to Kubernetes Cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: Create Kubernetes Deployment
+    k8s:
+      state: present
+      force: true
+      kubeconfig: "/var/lib/jenkins/.kube/config"
+      definition:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: xyztechnologies-deployment
+          namespace: default
+          labels:
+            app: xyztechnologies
+        spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: xyztechnologies
+            template:
+              metadata:
+                labels:
+                  app: xyztechnologies
+              spec:
+                containers:
+                - name: xyztechnologies
+                  image: viswar4/edureka-capstone-project2:{{ DOCKER_IMAGE_TAG }}
+                  ports:
+                  - containerPort: 8080
+  - name: Create Kubernetes Service
+    k8s:
+      state: present
+      kubeconfig: "/var/lib/jenkins/.kube/config"
+      definition:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: xyztechnologies-service
+          namespace: default
+        spec:
+          selector:
+            app: xyztechnologies
+          ports:
+          - protocol: TCP
+            port: 8080
+            targetPort: 8080
+          type: NodePort
